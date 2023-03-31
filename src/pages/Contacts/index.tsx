@@ -1,39 +1,47 @@
+import { CircularProgress, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ContactCard } from "../../components/ContactCard";
 import { ContactList } from "../../components/ContactList";
-import { Title } from "../../components/Title";
+import { BaseLayout } from "../../layout/baseLayout";
 import { getContacts } from "../../services/api";
 import { Contact } from "../../types";
 
 
 
-export function Contacts(){
-    const [search,setSearch] = useState('')
-    const [contacts,setContacts] = useState<Contact[]>([])
-     
-    useEffect(()=>{
-        async function listContacts(){
-         setContacts(await getContacts())
+export function Contacts() {
+
+    const [search, setSearch] = useState('')
+    const [isLoading, setIsLoading] = useState<Boolean>(false)
+    const [contacts, setContacts] = useState<Contact[]>([])
+
+
+    const filteredContacts = () => {
+        
+
+    }
+
+    useEffect(() => {
+        async function listContacts() {
+            setIsLoading(true)
+            setContacts(await getContacts())
+            setIsLoading(false)
         }
         listContacts()
-    },[])
-    return (
-        <>
-          <header>
-            <Title text="Agenda de Contatos"/>
-          </header>
-            <main>
-                <input type="search" className="inputSearch"/>
-                <ContactList>
-                    {
-                        contacts.map(contact=>{
-                           return <ContactCard contactData={contact}/>
-                        })
-                    }
-                </ContactList>
-            </main>
-        </>
 
-        
+    }, [])
+    return (
+        <BaseLayout appBarTitle="Agenda de Contatos">
+            <TextField variant="outlined" fullWidth />
+            {
+                isLoading ? <CircularProgress /> :
+                    (<ContactList>{
+                        contacts.map(contact => {
+                            return <ContactCard key={contact.login.uuid} contactData={contact} />
+                        })}
+                    </ContactList>)
+            }
+
+
+        </BaseLayout>
     )
 }
